@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 from reparse.config import pattern_max_recursion_depth
 from reparse.expression import Group, AlternatesGroup, Expression
 from reparse.util import separate_string
@@ -55,7 +56,7 @@ class Function_Builder(object):
             def func(_):
                 if any(_):
                     return _
-        func.__name__ = name
+        func.__name__ = str(name)
         return func
 
     def add_function(self, name, function):
@@ -76,12 +77,13 @@ class Expression_Builder(object):
     >>> function_builder.get_function = get_function
     >>> expression = {'greeting':{'greeting':{'Expression': '(hey)|(cool)', 'Groups' : ['greeting', 'cooly']}}}
     >>> eb = Expression_Builder(expression, function_builder)
-    >>> eb.get_type("greeting").findall("hey, cool!")
+    >>> eb.get_type("greeting").findall("hey, cool!")  # doctest: +IGNORE_UNICODE
     [[('hey',), ('',)], [('',), ('cool',)]]
     """
-    type_db = {}
 
     def __init__(self, expressions_dict, function_builder):
+        self.type_db = {}
+
         for expression_type, expressions in expressions_dict.items():
             type_expressions = []
             for name, expression in expressions.items():
@@ -106,7 +108,7 @@ class Expression_Builder(object):
 
 def build_pattern(pattern_name, pattern_regex, expression_builder, function_builder):
     final_function = function_builder.get_function(pattern_name, "pattern")
-    inbetweens, expression_names = separate_string(pattern_regex, "<", ">")
+    inbetweens, expression_names = separate_string(pattern_regex)
     expressions = []
     for name in expression_names:
         expression = expression_builder.get_type(name)

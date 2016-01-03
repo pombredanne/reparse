@@ -1,9 +1,11 @@
-def separate_string(string, start_delimiter, end_delimiter):
+import regex
+
+def separate_string(string):
     """
-    >>> separate_string("test (2)", "(", ")")
+    >>> separate_string("test <2>")
     (['test ', ''], ['2'])
     """
-    string_list = string.replace(end_delimiter, start_delimiter).split(start_delimiter)
+    string_list = regex.split(r'<(?![!=])', regex.sub(r'>', '<', string))
     return string_list[::2], string_list[1::2]  # Returns even and odd elements
 
 
@@ -35,7 +37,7 @@ def remove_lower_overlapping(current, higher):
     >>> remove_lower_overlapping([('z', 5, 6)], [('a', 0, 5)])
     [('z', 5, 6), ('a', 0, 5)]
     """
-    for i, (match, h_start, h_end) in enumerate(higher):
+    for (match, h_start, h_end) in higher:
         overlaps = list(overlapping_at(h_start, h_end, current))
         for overlap in overlaps:
             del current[overlap]
